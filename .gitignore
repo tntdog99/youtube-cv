@@ -3,3 +3,4 @@ videos/
 credentials.json
 .config
 __pycache__
+venv
