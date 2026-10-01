@@ -380,6 +380,9 @@ def edit_comment(comment_text, comment_id):
     )
     response = request.execute()
 
+def clear():
+    """clears the screen"""
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 print("Fetching comments...")
 video_id = "5XTHsdMPPQs"
@@ -388,7 +391,7 @@ os.makedirs("./videos", exist_ok=True)
 
 with open(f"./videos/{video_id}.bin", "wb") as f:
     dill.dump(comments, f)
-os.system('cls')
+clear()
 rprint("Fetched comments")
 filtered_comments = comments.copy()
 commentn = 0
@@ -398,7 +401,7 @@ sort_pars = ["none"]
 def render():
     global old
     if old != commentn:
-        os.system('cls')
+        clear()
         rprint(f"Comment {commentn + 1} of {len(filtered_comments)}")
         rprint(f"Sorted by: {', '.join(sort_pars)}")
         if len(filtered_comments) != 0:
@@ -415,7 +418,7 @@ def render():
 def filtered_empty_block():
 
     if len(filtered_comments) == 0 and len(comments) != 0:
-        os.system('cls')
+        clear()
         rprint("No comments match the filter criteria.")
         return True
     return False
@@ -427,7 +430,7 @@ def reply_nav_app():
 
     def refresh_nav():
         if state["oldreply"] != state["replyn"]:
-            os.system('cls')
+            clear()
             rprint(f"reply {state['replyn'] + 1} of {len(filtered_comments[commentn]['replies']) + 1}")
             rprint(f"Sorted by: {', '.join(sort_pars)}")
             
@@ -479,7 +482,7 @@ def do_edit():
     try:
         editted_text = session_prompt(session, "edit: ")
     except Cancelled:
-        os.system('cls')
+        clear()
         old = -1
         return
     editted_text = editted_text.encode('utf-8').decode('unicode_escape')
@@ -498,7 +501,7 @@ def do_delete():
     try:
         confirm = prompt_text("do you really want to delete this comment? enter 'CONFIRM' to confirm: ")
     except Cancelled:
-        os.system('cls')
+        clear()
         old = -1
         return
     if confirm == "CONFIRM":
@@ -543,12 +546,12 @@ def post_actions():
         if option == "delete":
             do_delete()
     except Cancelled:
-        os.system('cls')
+        clear()
         old = -1
 
 def change_video():
     global comments, filtered_comments, video_id, commentn, old, sort_pars
-    os.system('cls')
+    clear()
     try:
         video_id_candidate = prompt_text("enter video id: ")
         load_from_file_or_fetch = prompt_choice("load from file or refrest?: ", choices=["file", "refresh"], default="file")
@@ -565,17 +568,17 @@ def change_video():
         commentn = 0
         old = -1
         sort_pars = ["none"]
-        os.system('cls')
+        clear()
         print("Fetched comments")
     except Cancelled:
-        os.system('cls')
+        clear()
         old = -1
 
 
 
 def filter_comments():
     global filtered_comments, commentn, old, search_term
-    os.system('cls')
+    clear()
     console = Console()
     try:
         include_replies = prompt_choice("include replies in search?", choices=["y", "n"], default="n")
@@ -616,13 +619,13 @@ def filter_comments():
         old = -1
         print("filtered comments")
     except Cancelled:
-        os.system('cls')
+        clear()
         old = -1
 
 
 def refresh_comments():
     global comments, filtered_comments, commentn, old, sort_pars
-    os.system('cls')
+    clear()
     print("Refreshing comments...")
     comments = fetch_all_comments(video_id)
     with open(f"./videos/{video_id}.bin", "wb") as f:
@@ -631,13 +634,13 @@ def refresh_comments():
     commentn = 0
     old = -1
     sort_pars = ["none"]
-    os.system('cls')
+    clear()
     print("Refreshed comments")
 
 
 def sort_comments():
     global filtered_comments, commentn, old, sort_pars
-    os.system('cls')
+    clear()
     try:
         reverse = prompt_choice("reverse order?", choices=["y", "n"], default="n")
         sort_type = prompt_choice("sorts", choices=["likes", "replies", "update time", "publish time", "none"], default="none")
@@ -658,13 +661,13 @@ def sort_comments():
         commentn = 0
         old = -1
     except Cancelled:
-        os.system('cls')
+        clear()
         old = -1
 
 
 def show_help():
     global old
-    os.system('cls')
+    clear()
     rprint("[bold underline]Controls[/bold underline]\n")
     rprint("[bold]w[/bold]          Previous comment")
     rprint("[bold]s[/bold]          Next comment")
@@ -688,7 +691,7 @@ def show_help():
         full_screen=False,
     )
     wait_app.run()
-    os.system('cls')
+    clear()
     old = -1
 
 
