@@ -41,7 +41,10 @@ if pathlib.Path('./.config').exists() == False:
             "_comment": """
             timezone uses the IANA time zone format,
             terminal:
-            set to 'wt' (windows terminal) for auto scrolling back to the top, use plain for any other terminal
+            some support moving the scrollback view, some dont
+            supported:
+            wt - windows terminal
+            konsole
             
             """,
             "timezone": "UTC",
@@ -59,16 +62,27 @@ OS = platform.system()
 
 
 
+supported_terminals = ["wt", "konsole"]
 
-if terminal == "wt":
-    import pyautogui
-    
+if terminal in supported_terminals:
+    try:
+        import pyautogui
+    except ImportError:
+        print(f"pyautogui is required for terminal {terminal}, please install it with 'pip install pyautogui' or change your terminal in .config to 'plain'")
+        exit(1)
     
 
 class Cancelled(Exception):
 
     pass
 
+
+
+def top_of_scroll_back():
+    if terminal == 'wt':
+        pyautogui.hotkey('ctrl', 'shift', 'home')
+    if terminal == 'konsole':
+        pyautogui.hotkey('shift', 'home')
 
 def prompt_choice(prompt_text, choices=None, default=None, case_sensitive=False):
     session = PromptSession()
@@ -410,8 +424,7 @@ def render():
             print("No comments")
 
         time.sleep(0.1)
-        if terminal == 'wt':
-            pyautogui.hotkey('ctrl', 'shift', 'home')
+        top_of_scroll_back()
         old = commentn
 
 
@@ -444,8 +457,7 @@ def reply_nav_app():
                 print("No comments")
 
             time.sleep(0.1)
-            if terminal == 'wt':
-                pyautogui.hotkey('ctrl', 'shift', 'home')
+            top_of_scroll_back()
             state["oldreply"] = state["replyn"]
 
     refresh_nav()
@@ -743,7 +755,7 @@ def _(event):
 async def _(event):
     if filtered_empty_block():
         return
-    await run_in_terminal(sort_comments)
+    await run_in_terminal(sort_comments, in_executor=True)
     render()
 
 
