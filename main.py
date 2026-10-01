@@ -763,7 +763,7 @@ async def _(event):
 async def _(event):
     if filtered_empty_block():
         return
-    await run_in_terminal(show_help)
+    await run_in_terminal(show_help, in_executor=True)
     render()
 
 
