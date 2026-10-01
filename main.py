@@ -486,7 +486,7 @@ def do_edit():
         old = -1
         return
     editted_text = editted_text.encode('utf-8').decode('unicode_escape')
-    os.system("cls")
+    clear()
     if replyn == 0:
         commentid = filtered_comments[commentn]['id']
     else:
@@ -505,7 +505,7 @@ def do_delete():
         old = -1
         return
     if confirm == "CONFIRM":
-        os.system("cls")
+        clear()
         if replyn == 0:
             comment_id = filtered_comments[commentn]['id']
         else:
@@ -513,7 +513,7 @@ def do_delete():
         youtube.comments().delete(id=comment_id).execute()
         old = -1
     else:
-        os.system("cls")
+        clear()
         print("canceled")
         time.sleep(3)
         old = -1
@@ -521,7 +521,7 @@ def do_delete():
 
 def post_actions():
     global old
-    os.system("cls")
+    clear()
     console = Console()
     try:
         option = prompt_choice("", choices=["reply", "comment", "edit", "delete"], default="reply")
@@ -678,19 +678,9 @@ def show_help():
     rprint("[bold]c[/bold]          Change video  [dim](load from file or fetch)[/dim]")
     rprint("[bold]h[/bold]          Show this help screen")
     rprint("[bold]q[/bold]          Quit")
-    rprint("\n[dim]Press any key to return...[/dim]")
+    rprint("\n[dim]Press ENTER to return...[/dim]")
     
-    wait_kb = KeyBindings()
-    @wait_kb.add(Keys.Any)
-    def _(event):
-        event.app.exit()
-
-    wait_app = Application(
-        key_bindings=wait_kb,
-        layout=Layout(Window(FormattedTextControl(text=""), height=1)),
-        full_screen=False,
-    )
-    wait_app.run()
+    input()
     clear()
     old = -1
 
