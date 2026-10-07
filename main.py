@@ -604,7 +604,7 @@ def filter_comments():
                                 print(len(filtered_comments))
                                 break
         elif search_type == "user":
-            search_term = prompt_text("Enter username").lower()
+            search_term = prompt_text("Enter username: ").lower()
             filtered_comments = []
             for comment in comments:
                 if search_term in comment["authorDisplayName"].lower():
