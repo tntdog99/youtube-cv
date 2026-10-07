@@ -14,7 +14,7 @@ from prompt_toolkit.layout.containers import Window
 from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.application import run_in_terminal
 from prompt_toolkit.keys import Keys
-
+import gzip
 kb = KeyBindings()
 
 
@@ -248,10 +248,16 @@ def fetch_all_comments(video_id):
 
 
 def load_comments_from_file(video_id):
-    with open(f"./videos/{video_id}.bin", "rb") as f:
-        return dill.load(f)
-
-
+    with gzip.open(f"./videos/{video_id}.json.gz", "rt", encoding='utf-8') as f:
+        return json.load(f)
+    # with open(f"./videos/{video_id}.json", "r") as f:
+    #     return json.load(f)
+def write_comments_to_file(video_id):
+    global comments
+    with gzip.open(f"./videos/{video_id}.json.gz", "wt", encoding='utf-8') as f:
+        json.dump({"file_data": None, "comments": comments}, f, ensure_ascii=False)
+    # with open(f"./videos/{video_id}.json", "w") as f:
+    #     json.dump({"file_data": None, "comments": comments}, f)
 def highlight(text, term):
     t = Text(text)
     start = 0
@@ -397,20 +403,6 @@ def edit_comment(comment_text, comment_id):
 def clear():
     """clears the screen"""
     os.system('cls' if os.name == 'nt' else 'clear')
-
-print("Fetching comments...")
-video_id = "5XTHsdMPPQs"
-comments = fetch_all_comments(video_id)
-os.makedirs("./videos", exist_ok=True)
-
-with open(f"./videos/{video_id}.bin", "wb") as f:
-    dill.dump(comments, f)
-clear()
-rprint("Fetched comments")
-filtered_comments = comments.copy()
-commentn = 0
-old = -1
-sort_pars = ["none"]
 
 def render():
     global old
@@ -566,15 +558,14 @@ def change_video():
     clear()
     try:
         video_id_candidate = prompt_text("enter video id: ")
-        load_from_file_or_fetch = prompt_choice("load from file or refrest?: ", choices=["file", "refresh"], default="file")
+        load_from_file_or_fetch = prompt_choice("load from file or refrest?: ", choices=["file", "refresh"], default="refresh")
         if load_from_file_or_fetch == "file":
             comments = load_comments_from_file(video_id_candidate)
             video_id = video_id_candidate
         else:
             print("Fetching comments...")
             comments = fetch_all_comments(video_id_candidate)
-            with open(f"./videos/{video_id_candidate}.bin", "wb") as f:
-                dill.dump(comments, f)
+            write_comments_to_file(video_id_candidate)
             video_id = video_id_candidate
         filtered_comments = comments.copy()
         commentn = 0
@@ -636,12 +627,11 @@ def filter_comments():
 
 
 def refresh_comments():
-    global comments, filtered_comments, commentn, old, sort_pars
+    global comments, filtered_comments, commentn, old, sort_pars, video_id
     clear()
     print("Refreshing comments...")
     comments = fetch_all_comments(video_id)
-    with open(f"./videos/{video_id}.bin", "wb") as f:
-        dill.dump(comments, f)
+    write_comments_to_file(video_id)
     filtered_comments = comments.copy()
     commentn = 0
     old = -1
@@ -765,6 +755,23 @@ async def _(event):
         return
     await run_in_terminal(show_help, in_executor=True)
     render()
+
+os.makedirs("./videos", exist_ok=True)
+video_id = "5XTHsdMPPQs"
+
+comments = []
+commentn = 0
+old = -1
+sort_pars = ["none"]
+
+if not pathlib.Path(f"./videos/{video_id}.json").exists():
+    refresh_comments()
+else:
+    comments = load_comments_from_file(video_id)
+filtered_comments = comments.copy()
+
+
+
 
 
 render()
