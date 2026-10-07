@@ -764,7 +764,7 @@ commentn = 0
 old = -1
 sort_pars = ["none"]
 
-if not pathlib.Path(f"./videos/{video_id}.json").exists():
+if not pathlib.Path(f"./videos/{video_id}.json.gz").exists():
     refresh_comments()
 else:
     comments = load_comments_from_file(video_id)
