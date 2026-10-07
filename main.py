@@ -155,10 +155,9 @@ def fetch_all_comments(video_id):
         response = request.execute()
         items = response.get("items", [])
 
-        # Keep page-local structures so we can preserve order exactly as before
-        page_entries = []  # list of (parent_id, comment_data, totalReplyCount)
-        parents_with_replies = {}  # parent_id -> comment_data
-        next_tokens = {}  # parent_id -> nextPageToken from first-page response (if any)
+        page_entries = []
+        parents_with_replies = {}
+        next_tokens = {}
 
         for item in items:
             top = item["snippet"]["topLevelComment"]
@@ -249,7 +248,7 @@ def fetch_all_comments(video_id):
 
 def load_comments_from_file(video_id):
     with gzip.open(f"./videos/{video_id}.json.gz", "rt", encoding='utf-8') as f:
-        return json.load(f)
+        return json.load(f)['comments']
     # with open(f"./videos/{video_id}.json", "r") as f:
     #     return json.load(f)
 def write_comments_to_file(video_id):
